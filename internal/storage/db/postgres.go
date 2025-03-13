@@ -3,17 +3,17 @@ package db
 import (
 	"database/sql"
 	"fmt"
+	"github.com/danizion/rise/internal/utils"
 	_ "github.com/lib/pq"
 	"log"
-	"os"
 )
 
 func Init() *sql.DB {
-	host := getEnvOrDefault("POSTGRES_HOST", "localhost")
-	port := getEnvOrDefault("POSTGRES_PORT", "5433")
-	user := getEnvOrDefault("POSTGRES_USER", "myuser")
-	password := getEnvOrDefault("POSTGRES_PASSWORD", "mypassword")
-	dbname := getEnvOrDefault("POSTGRES_DB", "mydb")
+	host := utils.GetEnvOrDefault("POSTGRES_HOST", "localhost")
+	port := utils.GetEnvOrDefault("POSTGRES_PORT", "5433")
+	user := utils.GetEnvOrDefault("POSTGRES_USER", "myuser")
+	password := utils.GetEnvOrDefault("POSTGRES_PASSWORD", "mypassword")
+	dbname := utils.GetEnvOrDefault("POSTGRES_DB", "mydb")
 
 	dsn := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
 		host, port, user, password, dbname)
@@ -29,13 +29,6 @@ func Init() *sql.DB {
 		log.Fatalf("Error initializing the database schema: %v", err)
 	}
 	return db
-}
-
-func getEnvOrDefault(key, defaultValue string) string {
-	if value := os.Getenv(key); value != "" {
-		return value
-	}
-	return defaultValue
 }
 
 func initializeSchemaFromSQL(db *sql.DB) error {

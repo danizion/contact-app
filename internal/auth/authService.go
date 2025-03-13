@@ -1,6 +1,7 @@
 package auth
 
 import (
+	"github.com/danizion/rise/internal/utils"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -8,7 +9,7 @@ import (
 )
 
 // Secret key used to sign JWT tokens - in production this should be stored securely
-var jwtSecretKey = []byte("sercret-to-be-replaced") // TODO: Move this to environment variable
+var jwtSecretKey = []byte(utils.GetEnvOrDefault("AUTH_SECRET", "im-a-secret-key"))
 
 type Claims struct {
 	UserID int `json:"user_id"`

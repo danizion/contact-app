@@ -2,7 +2,7 @@
 
 ## Overview
 
-Rise is a robust contact management API that allows users to create accounts, authenticate, and manage their personal contacts. The application provides comprehensive CRUD operations for contacts with features like pagination and filtering.
+Here is a robust contact management API that allows users to create accounts, authenticate, and manage their personal contacts. The application provides comprehensive CRUD operations for contacts with features like pagination and filtering.
 
 ## Architecture
 
@@ -260,21 +260,21 @@ The application uses Redis to cache contact data:
 
 ### User Registration
 ```bash
-curl -X POST http://localhost:8080/users \
+curl -X POST http://localhost:80/users \
   -H "Content-Type: application/json" \
   -d '{"user_name":"johndoe","email":"john@example.com","password":"securepassword"}'
 ```
 
 ### User Login
 ```bash
-curl -X POST http://localhost:8080/login \
+curl -X POST http://localhost:80/login \
   -H "Content-Type: application/json" \
   -d '{"email":"john@example.com","password":"securepassword"}'
 ```
 
 ### Create Contact
 ```bash
-curl -X POST http://localhost:8080/contacts \
+curl -X POST http://localhost:80/contacts \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer YOUR_JWT_TOKEN" \
   -d '{"first_name":"Jane","last_name":"Smith","phone_number":"123-456-7890","address":"123 Main St"}'
@@ -282,13 +282,13 @@ curl -X POST http://localhost:8080/contacts \
 
 ### Get Contacts
 ```bash
-curl -X GET "http://localhost:8080/contacts?page=1&first_name=Jane" \
+curl -X GET "http://localhost:80/contacts?page=1&first_name=Jane" \
   -H "Authorization: Bearer YOUR_JWT_TOKEN"
 ```
 
 ### Update Contact
 ```bash
-curl -X PATCH http://localhost:8080/contacts/456 \
+curl -X PATCH http://localhost:80/contacts/456 \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer YOUR_JWT_TOKEN" \
   -d '{"first_name":"Jane","last_name":"Doe"}'
@@ -296,6 +296,6 @@ curl -X PATCH http://localhost:8080/contacts/456 \
 
 ### Delete Contact
 ```bash
-curl -X DELETE http://localhost:8080/contacts/456 \
+curl -X DELETE http://localhost:80/contacts/456 \
   -H "Authorization: Bearer YOUR_JWT_TOKEN"
 ```

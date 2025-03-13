@@ -22,6 +22,8 @@ services:
       - POSTGRES_DB=mydb
       - REDIS_HOST=redis
       - REDIS_PORT=6379
+      - PORT=8080
+      - AUTH_SECRET=q1ZVgKn7V1qHTUMtl4IGQzvV7Lzsm3ZhN6v27lFweZ4=
     depends_on:
       postgres:
         condition: service_healthy

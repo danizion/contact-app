@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/danizion/rise/internal/utils"
 	"log/slog"
 
 	"github.com/danizion/rise/internal/api"
@@ -46,12 +47,11 @@ func main() {
 		protectedRoutes.DELETE("/contacts/:id", handler.DeleteContact)
 	}
 
-	slog.Info("Server starting on :8080")
-
+	port := utils.GetEnvOrDefault("PORT", "8080")
+	router.Run(port)
+	slog.Info("Server started on port", "port", port)
 	// start server
 	if err := router.Run(); err != nil {
 		slog.Error("Failed to start server", "error", err)
 	}
 }
-
-// TODO: move this part to relevant place
