@@ -182,7 +182,7 @@ All contact management endpoints require authentication using the JWT token obta
   - `500 Internal Server Error`: Server error
 
 #### Update Contact
-- **Endpoint**: `PATCH /contacts/:id`
+- **Endpoint**: `PATCH /contacts/<contact_id>`
 - **Description**: Updates an existing contact for the authenticated user
 - **Authentication**: Required (JWT)
 - **Request Headers**:
@@ -213,7 +213,7 @@ All contact management endpoints require authentication using the JWT token obta
   - `500 Internal Server Error`: Server error
 
 #### Delete Contact
-- **Endpoint**: `DELETE /contacts/:id`
+- **Endpoint**: `DELETE /contacts/<contact_id>`
 - **Description**: Deletes a contact for the authenticated user
 - **Authentication**: Required (JWT)
 - **Request Headers**:
@@ -221,7 +221,7 @@ All contact management endpoints require authentication using the JWT token obta
   Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
   ```
 - **URL Parameters**:
-  - `id`: Contact ID to delete
+  - `<contact_id>`: Contact ID to delete
 - **Response (200 OK)**:
   ```json
   {
