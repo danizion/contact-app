@@ -54,7 +54,26 @@ func (r *Repository) GetUserByEmail(email string) (*models.User, error) {
 	var user models.User
 	err := r.db.Get(&user, query, email)
 	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, nil
+		}
 		log.Printf("Error fetching user by email: %v", err)
+		return nil, err
+	}
+	return &user, nil
+}
+
+// GetUserByUsername retrieves a user by username from the "users" table
+func (r *Repository) GetUserByUsername(username string) (*models.User, error) {
+	query := `SELECT id, username, email, hashed_password, created_at, updated_at 
+			  FROM users WHERE username = $1`
+	var user models.User
+	err := r.db.Get(&user, query, username)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, nil
+		}
+		log.Printf("Error fetching user by username: %v", err)
 		return nil, err
 	}
 	return &user, nil
@@ -87,7 +106,7 @@ func (r *Repository) GetContactsByUser(userID int) ([]models.Contact, error) {
 }
 
 // GetContactsByUserPaginated retrieves contacts for a user with pagination
-func (r *Repository) GetContactsByUserPaginated(userID int, page, pageSize int, firstName, lastName, phoneNumber string) ([]models.Contact, int, error) {
+func (r *Repository) GetContactsByUserPaginated(userID int, page, pageSize int, firstName, lastName, phoneNumber string, address string) ([]models.Contact, int, error) {
 	// Calculate offset
 	offset := (page - 1) * pageSize
 
@@ -115,6 +134,12 @@ func (r *Repository) GetContactsByUserPaginated(userID int, page, pageSize int, 
 		paramIndex++
 		baseQuery += fmt.Sprintf(" AND phone_number ILIKE $%d", paramIndex)
 		params = append(params, "%"+phoneNumber+"%")
+	}
+
+	if address != "" {
+		paramIndex++
+		baseQuery += fmt.Sprintf(" AND address ILIKE $%d", paramIndex)
+		params = append(params, "%"+address+"%")
 	}
 
 	// Get total count
@@ -282,4 +307,16 @@ func (r *Repository) DeleteContact(userID, contactID int) error {
 	}
 
 	return nil
+}
+
+// IsContactExists checks if a contact with the same first and last name exists for a user
+func (r *Repository) IsContactExists(userID int, firstName, lastName string) (bool, error) {
+	query := `SELECT COUNT(*) FROM contacts WHERE user_id = $1 AND first_name = $2 AND last_name = $3`
+	var count int
+	err := r.db.Get(&count, query, userID, firstName, lastName)
+	if err != nil {
+		log.Printf("Error checking existing contact: %v", err)
+		return false, err
+	}
+	return count > 0, nil
 }

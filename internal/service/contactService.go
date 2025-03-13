@@ -11,7 +11,7 @@ import (
 	"github.com/danizion/rise/internal/storage/redis"
 )
 
-// ContactService handles business logic for contacts
+// ContactService handles business logic for contacts has a pointer for repository for db interaction and redis for cache interaction
 type ContactService struct {
 	repo  *repository.Repository
 	redis *redis.Redis
@@ -26,26 +26,18 @@ func NewContactService(db *sql.DB, redisClient *redis.Redis) *ContactService {
 	}
 }
 
-func (s *UserService) GetContact(userID int) (*dtos.CreateUserRequestDto, error) {
-	// Use repository to get user
-	repoUser, err := s.repo.GetUser(userID)
-	if err != nil {
-		return nil, fmt.Errorf("failed to get user: %w", err)
-	}
-
-	// Map repository models to DTO
-	user := &dtos.CreateUserRequestDto{
-		Username: repoUser.Username,
-		Email:    repoUser.Email,
-		Password: repoUser.HashedPassword,
-	}
-
-	return user, nil
-}
-
-// CreateContact creates a new contact
 func (s *ContactService) CreateContact(contact dtos.CreateContactRequestDto) (int, error) {
-	// Map DTO to repository model
+	// Check if contact with same name exists
+	exists, err := s.repo.IsContactExists(contact.UserID, contact.FirstName, contact.LastName)
+	if err != nil {
+		return 0, fmt.Errorf("failed to check existing contact: %w", err)
+	}
+	if exists {
+		return 0, fmt.Errorf("contact with name %s %s already exists. Please use update to change the number or use a different name",
+			contact.FirstName, contact.LastName)
+	}
+
+	// Map DTO to model
 	repoContact := models.Contact{
 		UserID:      contact.UserID,
 		FirstName:   contact.FirstName,
@@ -54,7 +46,6 @@ func (s *ContactService) CreateContact(contact dtos.CreateContactRequestDto) (in
 		Address:     contact.Address,
 	}
 
-	// Use repository to create contact
 	contactID, err := s.repo.CreateContact(repoContact)
 	if err != nil {
 		return 0, fmt.Errorf("failed to create contact: %w", err)
@@ -65,40 +56,34 @@ func (s *ContactService) CreateContact(contact dtos.CreateContactRequestDto) (in
 		// Convert userID to string for cache key
 		userIDStr := strconv.Itoa(contact.UserID)
 
-		// Invalidate asynchronously to not block the response
-		go func() {
-			// Ignore errors in background goroutine
-			_ = s.redis.InvalidateUserCache(userIDStr)
-		}()
+		err := s.redis.InvalidateUserCache(userIDStr)
+		if err != nil {
+			return 0, err
+		}
 	}
 
 	return contactID, nil
 }
 
-// GetContactsPaginated retrieves contacts for a user with pagination
-func (s *ContactService) GetContactsPaginated(userID, page, pageSize int, firstName, lastName, phoneNumber string) (*dtos.PaginationResult, error) {
+// GetContacts retrieves contacts for a user with pagination
+func (s *ContactService) GetContacts(req dtos.GetContactRequestDto) (*dtos.PaginationResult, error) {
 	// Validate pagination parameters
-	if page < 1 {
-		page = 1
-	}
-	if pageSize < 1 {
-		pageSize = 10 // Default page size
-	}
 
 	if s.redis != nil {
 		// Create filter map
 		filters := map[string]string{
-			"first_name":   firstName,
-			"last_name":    lastName,
-			"phone_number": phoneNumber,
+			"first_name":   req.FirstName,
+			"last_name":    req.LastName,
+			"phone_number": req.PhoneNumber,
+			"address":      req.Address,
 		}
 
 		// Convert userID to string for cache key
-		userIDStr := strconv.Itoa(userID)
+		userIDStr := strconv.Itoa(req.UserID)
 
 		// Try to get pagination result from cache
 		var cachedResult dtos.PaginationResult
-		found, err := s.redis.GetCachedPaginationResult(userIDStr, filters, page, pageSize, &cachedResult)
+		found, err := s.redis.GetCachedPaginationResult(userIDStr, filters, req.Page, req.PageSize, &cachedResult)
 		if err == nil && found {
 			// Cache hit - return the pagination result directly
 			return &cachedResult, nil
@@ -106,7 +91,7 @@ func (s *ContactService) GetContactsPaginated(userID, page, pageSize int, firstN
 	}
 
 	// Cache miss or Redis not available, get from database
-	repoContacts, total, err := s.repo.GetContactsByUserPaginated(userID, page, pageSize, firstName, lastName, phoneNumber)
+	repoContacts, total, err := s.repo.GetContactsByUserPaginated(req.UserID, req.Page, req.PageSize, req.FirstName, req.LastName, req.PhoneNumber, req.Address)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get paginated contacts: %w", err)
 	}
@@ -125,8 +110,8 @@ func (s *ContactService) GetContactsPaginated(userID, page, pageSize int, firstN
 	}
 
 	// Calculate total pages
-	totalPages := total / pageSize
-	if total%pageSize > 0 {
+	totalPages := total / req.PageSize
+	if total%req.PageSize > 0 {
 		totalPages++
 	}
 
@@ -134,8 +119,8 @@ func (s *ContactService) GetContactsPaginated(userID, page, pageSize int, firstN
 	result := &dtos.PaginationResult{
 		Items:      contacts,
 		TotalCount: total,
-		Page:       page,
-		PageSize:   pageSize,
+		Page:       req.Page,
+		PageSize:   req.PageSize,
 		TotalPages: totalPages,
 	}
 
@@ -143,24 +128,27 @@ func (s *ContactService) GetContactsPaginated(userID, page, pageSize int, firstN
 	if s.redis != nil {
 		// Create filter map
 		filters := map[string]string{
-			"first_name":   firstName,
-			"last_name":    lastName,
-			"phone_number": phoneNumber,
+			"first_name":   req.FirstName,
+			"last_name":    req.LastName,
+			"phone_number": req.PhoneNumber,
 		}
 
 		// Convert userID to string for cache key
-		userIDStr := strconv.Itoa(userID)
+		userIDStr := strconv.Itoa(req.UserID)
 
 		// Cache the pagination result
-		_ = s.redis.CachePaginationResult(userIDStr, filters, page, pageSize, result)
+		err := s.redis.CachePaginationResult(userIDStr, filters, req.Page, req.PageSize, result)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	return result, nil
 }
 
-// UpdateContact updates an existing contact
+// UpdateContact updates an existing contact, only update none empty fields
 func (s *ContactService) UpdateContact(updateContactRequestDto dtos.UpdateContactRequestDto) error {
-	// Map DTO to repository model
+	// Map DTO to model
 	repoContact := models.Contact{
 		ID:          updateContactRequestDto.ID,
 		UserID:      updateContactRequestDto.UserID,
@@ -189,10 +177,9 @@ func (s *ContactService) UpdateContact(updateContactRequestDto dtos.UpdateContac
 		updateFields["address"] = true
 	}
 
-	// Use repository to update updateContactRequestDto
 	err := s.repo.UpdateContact(repoContact, updateFields)
 	if err != nil {
-		return fmt.Errorf("failed to update updateContactRequestDto: %w", err)
+		return err
 	}
 
 	// Invalidate cache for this user if Redis is available
@@ -201,7 +188,10 @@ func (s *ContactService) UpdateContact(updateContactRequestDto dtos.UpdateContac
 		userIDStr := strconv.Itoa(updateContactRequestDto.UserID)
 
 		// Invalidate cache for the given user
-		_ = s.redis.InvalidateUserCache(userIDStr)
+		err := s.redis.InvalidateUserCache(userIDStr)
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil
@@ -215,11 +205,13 @@ func (s *ContactService) DeleteContact(userID, contactID int) error {
 		userIDStr := strconv.Itoa(userID)
 
 		// Invalidate cache for the given user
-		_ = s.redis.InvalidateUserCache(userIDStr)
+		err := s.redis.InvalidateUserCache(userIDStr)
+		if err != nil {
+			return err
+		}
 
 	}
 
-	// Use repository to delete contact
 	err := s.repo.DeleteContact(contactID, userID)
 	if err != nil {
 		return fmt.Errorf("failed to delete contact: %w", err)

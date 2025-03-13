@@ -10,7 +10,7 @@ import (
 
 func Init() *sql.DB {
 	host := getEnvOrDefault("POSTGRES_HOST", "localhost")
-	port := getEnvOrDefault("POSTGRES_PORT", "5432")
+	port := getEnvOrDefault("POSTGRES_PORT", "5433")
 	user := getEnvOrDefault("POSTGRES_USER", "myuser")
 	password := getEnvOrDefault("POSTGRES_PASSWORD", "mypassword")
 	dbname := getEnvOrDefault("POSTGRES_DB", "mydb")

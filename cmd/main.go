@@ -1,26 +1,33 @@
 package main
 
 import (
-	"github.com/danizion/rise/internal/middlewares"
-	"log"
-
-	"github.com/danizion/rise/internal/storage/db"
-	"github.com/danizion/rise/internal/storage/redis"
+	"log/slog"
 
 	"github.com/danizion/rise/internal/api"
+	"github.com/danizion/rise/internal/logger"
+	"github.com/danizion/rise/internal/middlewares"
+	"github.com/danizion/rise/internal/storage/db"
+	"github.com/danizion/rise/internal/storage/redis"
 	"github.com/gin-gonic/gin"
 )
 
 func main() {
+	// Initialize the logger
+	logger.Setup()
+	slog.Info("Contact application starting up")
+
 	// init db
 	postgresDb := db.Init()
 	defer postgresDb.Close()
+	slog.Info("Database connection initialized")
 
 	// init redis
 	redisCache := redis.InitRedis()
+	slog.Info("Redis cache connection initialized")
 
 	// create handlers
 	handler := api.NewHandler(postgresDb, redisCache)
+	slog.Info("API handlers initialized")
 
 	// routing
 	router := gin.Default()
@@ -35,13 +42,15 @@ func main() {
 	{
 		protectedRoutes.GET("/contacts", handler.GetContacts)
 		protectedRoutes.POST("/contacts", handler.CreateContact)
-		protectedRoutes.PATCH("/contacts", handler.UpdateContact)
-		protectedRoutes.DELETE("/contacts", handler.DeleteContact)
+		protectedRoutes.PATCH("/contacts/:id", handler.UpdateContact)
+		protectedRoutes.DELETE("/contacts/:id", handler.DeleteContact)
 	}
+
+	slog.Info("Server starting on :8080")
 
 	// start server
 	if err := router.Run(); err != nil {
-		log.Fatal(err)
+		slog.Error("Failed to start server", "error", err)
 	}
 }
 

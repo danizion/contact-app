@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"github.com/danizion/rise/internal/auth"
+	"github.com/danizion/rise/internal/constants"
 	"github.com/danizion/rise/internal/dtos"
 	"github.com/danizion/rise/internal/models"
 	"github.com/danizion/rise/internal/repository"
@@ -26,12 +27,32 @@ func NewUserService(db *sql.DB) *UserService {
 
 // CreateUser creates a new user
 func (s *UserService) CreateUser(createUserRequestDto dtos.CreateUserRequestDto) (int, error) {
+	// Check if username already exists
+	existingUser, err := s.repo.GetUserByUsername(createUserRequestDto.Username)
+	if err != nil {
+		log.Printf("Error checking username: %v", err)
+		return 0, fmt.Errorf("failed to create user: %w", err)
+	}
+	if existingUser != nil {
+		return 0, fmt.Errorf(constants.ErrUsernameExists)
+	}
+
+	// Check if email already exists
+	existingUser, err = s.repo.GetUserByEmail(createUserRequestDto.Email)
+	if err != nil {
+		log.Printf("Error checking email: %v", err)
+		return 0, fmt.Errorf("failed to create user: %w", err)
+	}
+	if existingUser != nil {
+		return 0, fmt.Errorf(constants.ErrEmailExists)
+	}
+
 	// Map DTO to repository models
 
 	hashedPassword, err := auth.HashPassword(createUserRequestDto.Password)
 	if nil != err {
 		log.Printf("Failed to hash password: %v", err)
-		return 0, fmt.Errorf("failed to create createUserRequestDto: %w", err)
+		return 0, fmt.Errorf("failed to create user: %w", err)
 	}
 	repoUser := models.User{
 		Username:       createUserRequestDto.Username,
@@ -39,10 +60,10 @@ func (s *UserService) CreateUser(createUserRequestDto dtos.CreateUserRequestDto)
 		HashedPassword: hashedPassword,
 	}
 
-	// Use repository to create createUserRequestDto
+	// Use repository to create user
 	userID, err := s.repo.CreateUser(repoUser)
 	if err != nil {
-		return 0, fmt.Errorf("failed to create createUserRequestDto: %w", err)
+		return 0, fmt.Errorf("failed to create user: %w", err)
 	}
 
 	return userID, nil
@@ -52,7 +73,7 @@ func (s *UserService) CreateUser(createUserRequestDto dtos.CreateUserRequestDto)
 func (s *UserService) AuthenticateUser(email, password string) (*models.User, error) {
 	// Get user by email from repository
 	user, err := s.repo.GetUserByEmail(email)
-	if err != nil {
+	if err != nil || user == nil {
 		log.Printf("Failed to find user with email %s: %v", email, err)
 		return nil, fmt.Errorf("invalid credentials")
 	}

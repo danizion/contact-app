@@ -20,7 +20,7 @@ type GetContactsResponseDto struct {
 
 // UpdateContactRequestDto represents the data for updating a contact
 type UpdateContactRequestDto struct {
-	ID          int    `json:"contact_id"  binding:"required"`
+	ID          int    `json:"contact_id"`
 	UserID      int    `json:"user_id"`
 	FirstName   string `json:"first_name,omitempty"`
 	LastName    string `json:"last_name,omitempty"`
@@ -30,7 +30,13 @@ type UpdateContactRequestDto struct {
 
 // Define request structure with user ID in body
 type GetContactRequestDto struct {
-	UserID int `json:"user_id" `
+	UserID      int    `json:"user_id"`
+	Page        int    `json:"page"`
+	PageSize    int    `json:"page_size"`
+	FirstName   string `json:"first_name,omitempty"`
+	LastName    string `json:"last_name,omitempty"`
+	PhoneNumber string `json:"phone_number,omitempty"`
+	Address     string `json:"address,omitempty"`
 }
 
 // Define request structure for creating a contact
@@ -39,7 +45,7 @@ type CreateContactRequestDto struct {
 	FirstName   string `json:"first_name" binding:"required"`
 	LastName    string `json:"last_name" binding:"required"`
 	PhoneNumber string `json:"phone_number" binding:"required"`
-	Address     string `json:"address" binding:"omitempty"`
+	Address     string `json:"address" binding:"required"`
 }
 
 type DeleteContactRequestDto struct {
