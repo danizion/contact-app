@@ -1,14 +1,14 @@
 package main
 
 import (
-	"github.com/danizion/rise/internal/utils"
+	"github.com/danizion/contact-app/internal/utils"
 	"log/slog"
 
-	"github.com/danizion/rise/internal/api"
-	"github.com/danizion/rise/internal/logger"
-	"github.com/danizion/rise/internal/middlewares"
-	"github.com/danizion/rise/internal/storage/db"
-	"github.com/danizion/rise/internal/storage/redis"
+	"github.com/danizion/contact-app/internal/api"
+	"github.com/danizion/contact-app/internal/logger"
+	"github.com/danizion/contact-app/internal/middlewares"
+	"github.com/danizion/contact-app/internal/storage/db"
+	"github.com/danizion/contact-app/internal/storage/redis"
 	"github.com/gin-gonic/gin"
 )
 

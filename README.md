@@ -2,24 +2,61 @@
 
 ## Overview
 
-Here is a robust contact management API that allows users to create accounts, authenticate, and manage their personal contacts. The application provides comprehensive CRUD operations for contacts with features like pagination and filtering.
+A contact management API that allows users to create accounts, authenticate, and manage their personal contacts. The application provides comprehensive CRUD operations for contacts with features like pagination and filtering.
 
 ## Architecture
-
+![img.png](img.png)
 ### Technology Stack
 
-- **Backend**: Go with Gin web framework
+- **Backend**: Go with Gin web framework can be scaled horizontally
 - **Database**: PostgreSQL for persistent storage
 - **Caching**: Redis for improved performance
 - **Authentication**: JWT (JSON Web Tokens)
+- **NGINX**: Nginx serving as a reverse proxy and load balancing for app scaling ability
 
-### Core Components
-
-1. **API Layer**: Handles HTTP requests and responses
-2. **Service Layer**: Contains business logic for user and contact management
+I followed repository pattern which divides the application in to:
+1. **Handlers** - The backend entry point to handle HTTP requests and responses
+2. **Service Layer**: Contains business logic for user and contact management1. **API Layer**: Handles HTTP requests and responses
 3. **Repository Layer**: Manages data persistence and retrieval
-4. **Middleware**: Handles cross-cutting concerns like authentication
-5. **Storage**: Database and cache implementations
+
+### How To RUN
+
+1. clone repo:
+   ```
+   git clone https://github.com/danizion/contact-app.git
+   ```
+2. In the root directory (where docker-compose.yml is) run:
+   ```
+   docker-compose -p contacts-app up
+   ```
+   Congrats! the app is up and running. You should be able to see the app images, redis, docker and nginx images
+
+## Assigment explanation
+## On a personal note
+I chose to dive into deep waters and develop the app in golang (which made me sweat a fair bit giving this is my first golang experience) and decided to add users to the app to closer imitate a real live application
+## How my application meets product definitions:
+1. **each contact has**:
+  - first name
+  - last name
+  - phone number
+  - address
+2. **Services APIs required in my application**:
+  - Get contacts --> GET /contacts
+  - Search contact --> GET /contacts with wanted query params
+  - Add contact --> POST /contacts
+  - Edit contact --> PATCH /contacts<contact id>
+  - Delete contact --> DELETE /contacts/<contact id>
+
+I decided to adhere to RESTful API Standards (that the reason i dont have an endpoint named /search i.e)
+
+## Bonuses
+- Implemented the service in go 
+- Added users
+- Implemented authentication
+- Implemented caching mechanism
+- designed the system to be able to scale using ngnix to loadblance between server replicas
+
+
 
 ## API Endpoints
 
@@ -246,15 +283,7 @@ The application uses Redis to cache contact data:
    ```
 4. The server will start on port 8080 by default
 
-### Running with Docker
-1. Build the Docker image:
-   ```
-   docker build -t rise-app .
-   ```
-2. Run the application with Docker Compose:
-   ```
-   docker-compose up
-   ```
+
 
 ## API Testing Examples
 

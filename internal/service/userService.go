@@ -3,11 +3,11 @@ package service
 import (
 	"database/sql"
 	"fmt"
-	"github.com/danizion/rise/internal/auth"
-	"github.com/danizion/rise/internal/constants"
-	"github.com/danizion/rise/internal/dtos"
-	"github.com/danizion/rise/internal/models"
-	"github.com/danizion/rise/internal/repository"
+	"github.com/danizion/contact-app/internal/auth"
+	"github.com/danizion/contact-app/internal/constants"
+	"github.com/danizion/contact-app/internal/dtos"
+	"github.com/danizion/contact-app/internal/models"
+	"github.com/danizion/contact-app/internal/repository"
 	"log"
 )
 

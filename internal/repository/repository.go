@@ -6,7 +6,7 @@ import (
 	"log"
 	"strings"
 
-	"github.com/danizion/rise/internal/models"
+	"github.com/danizion/contact-app/internal/models"
 	"github.com/jmoiron/sqlx"
 )
 

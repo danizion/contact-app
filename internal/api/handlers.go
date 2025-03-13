@@ -8,10 +8,10 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/danizion/rise/internal/constants"
-	"github.com/danizion/rise/internal/dtos"
-	"github.com/danizion/rise/internal/service"
-	"github.com/danizion/rise/internal/storage/redis"
+	"github.com/danizion/contact-app/internal/constants"
+	"github.com/danizion/contact-app/internal/dtos"
+	"github.com/danizion/contact-app/internal/service"
+	"github.com/danizion/contact-app/internal/storage/redis"
 	"github.com/gin-gonic/gin"
 )
 

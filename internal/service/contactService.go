@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/danizion/rise/internal/dtos"
-	"github.com/danizion/rise/internal/models"
-	"github.com/danizion/rise/internal/repository"
-	"github.com/danizion/rise/internal/storage/redis"
+	"github.com/danizion/contact-app/internal/dtos"
+	"github.com/danizion/contact-app/internal/models"
+	"github.com/danizion/contact-app/internal/repository"
+	"github.com/danizion/contact-app/internal/storage/redis"
 )
 
 // ContactService handles business logic for contacts has a pointer for repository for db interaction and redis for cache interaction

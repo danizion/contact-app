@@ -9,7 +9,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/danizion/rise/internal/models"
+	"github.com/danizion/contact-app/internal/models"
 	"github.com/go-redis/redis/v8"
 )
 

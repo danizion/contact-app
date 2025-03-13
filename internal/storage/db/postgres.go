@@ -3,7 +3,7 @@ package db
 import (
 	"database/sql"
 	"fmt"
-	"github.com/danizion/rise/internal/utils"
+	"github.com/danizion/contact-app/internal/utils"
 	_ "github.com/lib/pq"
 	"log"
 )

@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/danizion/rise/internal/auth"
+	"github.com/danizion/contact-app/internal/auth"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
 )

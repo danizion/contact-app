@@ -1,7 +1,7 @@
 package auth
 
 import (
-	"github.com/danizion/rise/internal/utils"
+	"github.com/danizion/contact-app/internal/utils"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
