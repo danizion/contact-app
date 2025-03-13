@@ -4,7 +4,67 @@ import random
 import string
 
 BASE_URL = "http://localhost:80"
+'''
+The following tests are designed to test these scenarios:
+User Creation with Invalid Data
+Attempt to create a user using an incomplete payload (only providing a username). The expected outcome is a 400 error due to missing required fields such as email and password.
 
+Valid User Creation
+Create a user with all the required fields (user_name, email, and password) provided. The test expects a successful creation indicated by a 201 status code.
+
+Duplicate User Creation
+Create a user and then attempt to create another user with the same username and email. The first creation should succeed (201), while the duplicate attempt should fail with a 409 conflict error.
+
+Another Valid User Creation
+Create an additional valid user using different credentials to ensure that the system accepts multiple distinct users. A 201 status code is expected.
+
+Login with Wrong Credentials
+Attempt to log in using a valid user's email but with an incorrect password. The expected outcome is a 401 unauthorized error.
+
+Login with Correct Credentials
+Log in using the valid credentials of a previously created primary user. The test verifies a 200 status code and that a token is returned in the response.
+
+Contact Creation Without Authentication
+Attempt to create a contact without providing an Authorization header. The expected result is a 401 error indicating that authentication is required.
+
+Contact Creation with Missing Parameters
+Attempt to create a contact while omitting a required parameter (in this case, the "first_name"). The server should respond with a 400 error.
+
+Duplicate Contact Creation
+After a valid contact is created (via a fixture), try to create the same contact again using identical details. The expected outcome is a 409 error because the contact already exists.
+
+Update Contact with an Invalid ID
+Attempt to update a contact using a non-existent contact ID (e.g., 9999). The expected response is a 404 error indicating the contact is not found.
+
+Update Contact with One Field Change
+Create a contact and then update it by changing a single field (the phone number). The test verifies a successful update with a 200 status code and an appropriate success message.
+
+Update Contact with All Fields
+Create a new contact and then update all its fields (first_name, last_name, phone_number, and address). The expected outcome is a 200 status code along with a confirmation message that the contact was updated successfully.
+
+Get Contacts for a New User with No Contacts
+Create a new user who does not have any contacts and then request the contacts list. The test checks that the returned list is empty (length zero).
+
+Get Contacts for a User with Existing Contacts (No Query)
+After creating at least one contact for the primary user, fetch all contacts without specifying any query filters. The test expects a non-empty list indicating that contacts exist.
+
+Pagination of Contacts
+Ensure that pagination works as expected by:
+
+Checking that the first page (with a limit of 10) returns no more than 10 contacts.
+Verifying that the second page is returned as a list (even if it might be empty). This test creates additional contacts if necessary to meet the pagination criteria.
+Delete Contact with Invalid ID
+Attempt to delete a contact using an ID that does not exist (e.g., 9999). The expected response is a 404 error.
+
+Delete Contact by a Different User
+Try to delete a contact (created by the primary user) using the credentials of a secondary user. The test verifies that access control is enforced by expecting a 404 error.
+
+Successful Contact Deletion
+Create a new contact and then delete it using the same (primary) user's credentials. The expected outcome is a 200 status code indicating successful deletion.
+
+Repeated Contact Deletion
+Create a contact, delete it successfully, and then attempt to delete the same contact again. The second deletion should fail, returning a 404 error because the contact no longer exists.
+'''
 def random_string(length=6):
     return ''.join(random.choice(string.ascii_lowercase) for _ in range(length))
 

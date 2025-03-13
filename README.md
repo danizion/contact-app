@@ -16,7 +16,7 @@ A contact management API that allows users to create accounts, authenticate, and
 
 I followed repository pattern which divides the application in to:
 1. **Handlers** - The backend entry point to handle HTTP requests and responses
-2. **Service Layer**: Contains business logic for user and contact management1. **API Layer**: Handles HTTP requests and responses
+2. **Service Layer**: Contains business logic for user and contact management1.
 3. **Repository Layer**: Manages data persistence and retrieval
 
 ### How To RUN
@@ -51,7 +51,7 @@ I decided to adhere to RESTful API Standards (that the reason i dont have an end
 
 ## Bonuses
 - Implemented the service in go 
-- Added users
+- Added users - each user has its own contacts and every end point access will be handled for the requesting user using the information stored in the JWT token
 - Implemented authentication
 - Implemented caching mechanism
 - designed the system to be able to scale using ngnix to loadblance between server replicas
@@ -237,18 +237,18 @@ All contact management endpoints require authentication using the JWT token obta
 ## Data Models
 
 ### User
-- `ID`: Unique identifier (integer)
+- `ID`: Unique identifier (integer - output only)
 - `Username`: Unique username (string)
 - `Email`: Unique email address (string)
 - `Password`: Hashed password (string)
 
 ### Contact
-- `ID`: Unique identifier (integer)
-- `UserID`: Reference to the owner user (integer)
+- `ID`: Unique identifier (integer - output only)
+- `UserID`: Reference to the owner user (integer - output only)
 - `FirstName`: First name (string)
 - `LastName`: Last name (string)
 - `PhoneNumber`: Phone number (string)
-- `Address`: Address (string, optional)
+- `Address`: Address (string)
 
 ## Authentication Flow
 
@@ -267,23 +267,20 @@ The application uses Redis to cache contact data:
 2. Subsequent requests with the same parameters will be served from the cache if available
 3. When a user creates, updates, or deletes a contact, the cache for that user is invalidated
 
-## Running the Application
 
-### Prerequisites
-- Go 1.19 or higher
-- PostgreSQL
-- Redis
-
-### Running Locally
-1. Clone the repository
-2. Configure the database and Redis connections in the appropriate configuration files
-3. Run the application using:
+# Testing
+To test the app I created a python script that runs pytests that tests the end point on various tests scenarios. All the scenarios are described in the api_test.py
+### How to run the api_tests.py:
+#### Prerequisites
+1. **Python Installation** Python 3.8 or newer
+2. **Install Python Dependencies** 
+```
+   pip install pytest requests
    ```
-   go run cmd/main.go
+3. **Run the tests**
+```
+   python -m pytest api_tests.py -v
    ```
-4. The server will start on port 8080 by default
-
-
 
 ## API Testing Examples
 
