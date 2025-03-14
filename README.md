@@ -6,6 +6,7 @@ A contact management API that allows users to create accounts, authenticate, and
 
 ## Architecture
 <img width="790" alt="image" src="https://github.com/user-attachments/assets/974933c6-4707-440e-8d2b-545087421c95" />
+
 ### Technology Stack
 
 - **Backend**: Go with Gin web framework can be scaled horizontally
