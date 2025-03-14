@@ -5,7 +5,7 @@
 A contact management API that allows users to create accounts, authenticate, and manage their personal contacts. The application provides comprehensive CRUD operations for contacts with features like pagination and filtering.
 
 ## Architecture
-![img.png](img.png)
+<img width="790" alt="image" src="https://github.com/user-attachments/assets/974933c6-4707-440e-8d2b-545087421c95" />
 ### Technology Stack
 
 - **Backend**: Go with Gin web framework can be scaled horizontally
